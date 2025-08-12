@@ -76,7 +76,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    function createAddQuoteForm() {
+    const form = document.createElement('form');
+    form.id = 'add-quote-form';
     
+    form.innerHTML = `
+        <div>
+            <label for="quote-text">Quote:</label>
+            <textarea id="quote-text" required></textarea>
+        </div>
+        <div>
+            <label for="quote-author">Author:</label>
+            <input type="text" id="quote-author" required>
+        </div>
+        <button type="submit">Add Quote</button>
+    `;
+    
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = document.getElementById('quote-text').value;
+        const author = document.getElementById('quote-author').value;
+        addQuote(text, author);
+        // Additional logic to handle the new quote
+    });
+    
+    return form;
+}
     
     function addQuote() {
         const quoteText = document.getElementById('quote-input').value.trim();
