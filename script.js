@@ -4,6 +4,58 @@ document.addEventListener('DOMContentLoaded', function() {
     const taskInput = document.getElementById('task-input');
     const taskList = document.getElementById('task-list');
 
+    // Load tasks from localStorage when the page loads
+    function loadTasks() {
+        const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        
+        // Clear the current task list
+        taskList.innerHTML = '';
+        
+        // Add each stored task to the list
+        storedTasks.forEach(taskText => {
+            addTaskToDOM(taskText, false); // false means don't save to localStorage again
+        });
+    }
+
+    // Save tasks to localStorage
+    function saveTasks() {
+        const tasks = [];
+        document.querySelectorAll('#task-list li').forEach(taskItem => {
+            // Get the text without the remove button text
+            const taskText = taskItem.textContent.replace('Remove', '').trim();
+            tasks.push(taskText);
+        });
+        
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    // Add task to DOM (with option to save to localStorage)
+    function addTaskToDOM(taskText, saveToStorage = true) {
+        // Create new task item
+        const li = document.createElement('li');
+        li.textContent = taskText;
+        
+        // Create remove button
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = "Remove";
+        removeBtn.classList.add('remove-btn');
+        
+        // Add click event to remove button
+        removeBtn.onclick = function() {
+            taskList.removeChild(li);
+            saveTasks(); // Update localStorage after removal
+        };
+        
+        // Append elements
+        li.appendChild(removeBtn);
+        taskList.appendChild(li);
+        
+        // Save to localStorage if needed
+        if (saveToStorage) {
+            saveTasks();
+        }
+    }
+
     function addTask() {
         const taskText = taskInput.value.trim();
         
@@ -13,23 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Create new task item
-        const li = document.createElement('li');
-        li.textContent = taskText;
-        
-        // Create remove button
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = "Remove";
-        removeBtn.classList.add('remove-btn'); // Using classList.add() here
-        
-        // Add click event to remove button
-        removeBtn.onclick = function() {
-            taskList.removeChild(li);
-        };
-        
-        // Append elements
-        li.appendChild(removeBtn);
-        taskList.appendChild(li);
+        // Add task to DOM and save to localStorage
+        addTaskToDOM(taskText);
         
         // Clear input field
         taskInput.value = "";
@@ -44,94 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
             addTask();
         }
     });
-});    
-    function addTask() {
-        const taskText = taskInput.value.trim();
-        
-        if (taskText === "") {
-            alert("Please enter a task!");
-            return;
-        }
-        
-        const li = document.createElement('li');
-        li.textContent = taskText;
-        
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = "Remove";
-        removeBtn.className = 'remove-btn';
-        
-        removeBtn.onclick = function() {
-            taskList.removeChild(li);
-        };
-        
-        li.appendChild(removeBtn);
-        taskList.appendChild(li);
-        taskInput.value = "";
-    }
-    
-    addButton.addEventListener('click', addTask);
-    taskInput.addEventListener('keypress', function(event) {
-        if (event.key === 'Enter') {
-            addTask();
-        }
-    });
 
-    function createAddQuoteForm() {
-    const form = document.createElement('form');
-    form.id = 'add-quote-form';
-    
-    form.innerHTML = `
-        <div>
-            <label for="quote-text">Quote:</label>
-            <textarea id="quote-text" required></textarea>
-        </div>
-        <div>
-            <label for="quote-author">Author:</label>
-            <input type="text" id="quote-author" required>
-        </div>
-        <button type="submit">Add Quote</button>
-    `;
-    
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const text = document.getElementById('quote-text').value;
-        const author = document.getElementById('quote-author').value;
-        addQuote(text, author);
-        // Additional logic to handle the new quote
-    });
-    
-    return form;
-}
-    
-    function addQuote() {
-        const quoteText = document.getElementById('quote-input').value.trim();
-        const authorText = document.getElementById('author-input').value.trim();
-        
-        if (quoteText === "" || authorText === "") {
-            alert("Please enter both a quote and an author!");
-            return;
-        }
-        
-        const quoteList = document.getElementById('quote-list');
-        const li = document.createElement('li');
-        li.innerHTML = `"${quoteText}" - <em>${authorText}</em>`;
-        
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = "Remove";
-        removeBtn.className = 'remove-btn';
-        
-        removeBtn.onclick = function() {
-            quoteList.removeChild(li);
-        };
-        
-        li.appendChild(removeBtn);
-        quoteList.appendChild(li);
-        
-        // Clear inputs
-        document.getElementById('quote-input').value = "";
-        document.getElementById('author-input').value = "";
-    }
-    
-    // Initialize the quote form
-    createAddQuoteForm();
+    // Load tasks from localStorage when page loads
+    loadTasks();
 });
